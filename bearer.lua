@@ -12,7 +12,8 @@ end
 if token == nil then
     local auth_header = ngx.var.http_Authorization
     if auth_header then
-        _, _, token = string.find(auth_header, "Bearer%s+(.+)")
+        local _, _, token_header = string.find(auth_header, "Bearer%s+(.+)")
+        token = token_header
     end
 end
 
@@ -28,9 +29,9 @@ end
 -- https://github.com/SkyLothar/lua-resty-jwt#jwt-validators
 local validators = require "resty.jwt-validators"
 local claim_spec = {
-    -- validators.set_system_leeway(15), -- time in seconds
-    -- exp = validators.is_not_expired(),
-    -- iat = validators.is_not_before(),
+    validators.set_system_leeway(15), -- time in seconds
+    exp = validators.is_not_expired(),
+    iat = validators.is_not_before(),
     -- iss = validators.opt_matches("^http[s]?://yourdomain.auth0.com/$"),
     -- sub = validators.opt_matches("^[0-9]+$"),
     -- name = validators.equals_any_of({ "John Doe", "Mallory", "Alice", "Bob" }),

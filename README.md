@@ -20,6 +20,10 @@ docker run --rm \
            ubergarm/openresty-nginx-jwt
 ```
 
+Generate JWT for testing:
+http://jwtbuilder.jamiekurtz.com/
+
+
 Client:
 ```bash
 # apt-get install httpie || brew install httpie

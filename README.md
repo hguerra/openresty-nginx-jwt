@@ -1,6 +1,6 @@
 openresty-nginx-jwt
 ===
-[![](https://images.microbadger.com/badges/image/ubergarm/openresty-nginx-jwt.svg)](https://microbadger.com/images/ubergarm/openresty-nginx-jwt) [![](https://images.microbadger.com/badges/version/ubergarm/openresty-nginx-jwt.svg)](https://microbadger.com/images/ubergarm/openresty-nginx-jwt) [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/ubergarm/openresty-nginx-jwt/blob/master/LICENSE)
+[![](https://images.microbadger.com/badges/image/ubergarm/openresty-nginx-jwt.svg)](https://microbadger.com/images/ubergarm/openresty-nginx-jwt) [![](https://images.microbadger.com/badges/version/ubergarm/openresty-nginx-jwt.svg)](https://microbadger.com/images/ubergarm/openresty-nginx-jwt) [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/hguerra/openresty-nginx-jwt/blob/master/LICENSE)
 
 JWT Bearer Token authorization with `nginx`, `openresty`, and `lua-resty-jwt`.
 
@@ -14,24 +14,40 @@ Server:
 docker run --rm \
            -it \
            -e JWT_SECRET=secret \
+           -e JWT_ISS=domain.com \
            -v `pwd`/nginx.conf:/nginx.conf \
            -v `pwd`/bearer.lua:/bearer.lua \
            -p 8080:8080 \
-           ubergarm/openresty-nginx-jwt
+           heitorcarneiro/openresty-nginx-jwt:1.21.4.1-6-alpine-fat
 ```
 
 Generate JWT for testing:
+
 http://jwtbuilder.jamiekurtz.com/
+
+Example:
+```json
+{
+    "iss": "domain.com",
+    "iat": 1681770906,
+    "exp": 1681777666,
+    "aud": "www.example.com",
+    "sub": "heitor@example.com",
+    "name": "heitor",
+    "email": "heitor@example.com",
+    "r": [
+        "viewer",
+        "accessapproval.approver"
+    ]
+}
+```
 
 
 Client:
 ```bash
-# apt-get install httpie || brew install httpie
-http --print HBhb localhost:8080/secure/ "Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
-# token as url argument
-http --print HBhb localhost:8080/secure/?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ
-# token as cookie
-http --print HBhb localhost:8080/secure/ "Cookie:token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
+curl -i -X GET http://localhost:8080/request -H 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJkb21haW4uY29tIiwiaWF0IjoxNjgxNzcwOTA2LCJleHAiOjE2ODE3Nzc2NjYsImF1ZCI6Ind3dy5leGFtcGxlLmNvbSIsInN1YiI6ImhlaXRvckBleGFtcGxlLmNvbSIsIm5hbWUiOiJoZWl0b3IiLCJlbWFpbCI6ImhlaXRvckBleGFtcGxlLmNvbSIsInIiOlsidmlld2VyIiwiYWNjZXNzYXBwcm92YWwuYXBwcm92ZXIiXX0.r73ZjmC1fBsVDfRve1A9-84E4LhqhOIiL5fszzpD10c'
+
+curl -i -X GET http://localhost:8080/request?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJkb21haW4uY29tIiwiaWF0IjoxNjgxNzcwOTA2LCJleHAiOjE2ODE3Nzc2NjYsImF1ZCI6Ind3dy5leGFtcGxlLmNvbSIsInN1YiI6ImhlaXRvckBleGFtcGxlLmNvbSIsIm5hbWUiOiJoZWl0b3IiLCJlbWFpbCI6ImhlaXRvckBleGFtcGxlLmNvbSIsInIiOlsidmlld2VyIiwiYWNjZXNzYXBwcm92YWwuYXBwcm92ZXIiXX0.r73ZjmC1fBsVDfRve1A9-84E4LhqhOIiL5fszzpD10c
 ```
 
 
@@ -56,6 +72,7 @@ If you're looking for something beyond just JWT auth, check out [kong](https://g
 Also [Caddy](https://caddyserver.com/) might be faster for a simple project.
 
 ## References
+* https://github.com/ubergarm/openresty-nginx-jwt
 * https://github.com/openresty/docker-openresty
 * https://github.com/SkyLothar/lua-resty-jwt
 * https://github.com/svyatogor/resty-lua-jwt

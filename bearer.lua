@@ -1,5 +1,13 @@
 local jwt = require "resty.jwt"
 
+-- a helper function to response HTTP 401
+local function unauthorized(response_body)
+  ngx.status = ngx.HTTP_UNAUTHORIZED
+  ngx.header.content_type = "application/json; charset=utf-8"
+  ngx.say(response_body)
+  ngx.exit(ngx.HTTP_UNAUTHORIZED)
+end
+
 -- first try to find JWT token as url parameter e.g. ?token=BLAH
 local token = ngx.var.arg_token
 
@@ -19,10 +27,15 @@ end
 
 -- finally, if still no JWT token, kick out an error and exit
 if token == nil then
-    ngx.status = ngx.HTTP_UNAUTHORIZED
-    ngx.header.content_type = "application/json; charset=utf-8"
-    ngx.say("{\"error\": \"missing JWT token or Authorization header\"}")
-    ngx.exit(ngx.HTTP_UNAUTHORIZED)
+    return unauthorized("{\"error\": \"missing JWT token or Authorization header\"}")
+end
+
+-- make sure to set and put "env JWT_SECRET;" in nginx.conf
+-- make sure to set and put "env JWT_ISS;" in nginx.conf
+local jwt_secret = os.getenv("JWT_SECRET")
+local jwt_iss = os.getenv("JWT_ISS")
+if not jwt_secret or not jwt_iss then
+  return unauthorized("{\"error\": \"missing enviroment variables\"}")
 end
 
 -- validate any specific claims you need here
@@ -32,13 +45,12 @@ local claim_spec = {
     validators.set_system_leeway(15), -- time in seconds
     exp = validators.is_not_expired(),
     iat = validators.is_not_before(),
-    -- iss = validators.opt_matches("^http[s]?://yourdomain.auth0.com/$"),
-    -- sub = validators.opt_matches("^[0-9]+$"),
-    -- name = validators.equals_any_of({ "John Doe", "Mallory", "Alice", "Bob" }),
+    iss = validators.equals(jwt_iss),
+    sub = validators.required(),
+    r = validators.required() -- roles, ex: viewer,editor,owner,admin
 }
 
--- make sure to set and put "env JWT_SECRET;" in nginx.conf
-local jwt_obj = jwt:verify(os.getenv("JWT_SECRET"), token, claim_spec)
+local jwt_obj = jwt:verify(jwt_secret, token, claim_spec)
 if not jwt_obj["verified"] then
     ngx.status = ngx.HTTP_UNAUTHORIZED
     ngx.log(ngx.WARN, jwt_obj.reason)

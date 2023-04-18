@@ -1,6 +1,6 @@
 openresty-nginx-jwt
 ===
-[![](https://images.microbadger.com/badges/image/ubergarm/openresty-nginx-jwt.svg)](https://microbadger.com/images/ubergarm/openresty-nginx-jwt) [![](https://images.microbadger.com/badges/version/ubergarm/openresty-nginx-jwt.svg)](https://microbadger.com/images/ubergarm/openresty-nginx-jwt) [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/hguerra/openresty-nginx-jwt/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/hguerra/openresty-nginx-jwt/blob/master/LICENSE)
 
 JWT Bearer Token authorization with `nginx`, `openresty`, and `lua-resty-jwt`.
 
@@ -61,7 +61,7 @@ Restart a container and volume mount in all of the required configuration.
 ## Build
 To update or build a custom image edit the `Dockerfile` and:
 ```bash
-docker build -t ubergarm/openresty-nginx-jwt .
+docker build -t heitorcarneiro/openresty-nginx-jwt:1.21.4.1-6-alpine-fat .
 ```
 
 ## Note
